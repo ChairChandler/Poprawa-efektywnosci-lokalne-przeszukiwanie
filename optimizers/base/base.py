@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import NewType, List
 from loader import Matrix2D
 from abc import ABC, abstractmethod
+import numpy as np
 
 Route = NewType('Route', List[int])
 
@@ -19,16 +20,22 @@ class Optimizer(ABC):
         self.init_cost = self._calculate_score(self.route)
 
     def __call__(self) -> [int, Route]:
-        cost, route = self._search()
-        delta = self.init_cost - cost
-        return delta, route
+        solution = self._search()
+        return solution.cost, solution.route
 
     @abstractmethod
     def _search(self) -> Solution:
         pass
 
     def _calculate_score(self, route: Route):
-        return sum(self.distance_matrix[a, b] for a, b in zip(route, route[1:] + route[0]))
+        try:
+            return sum(
+                self.distance_matrix[a, b]
+                if a is not None and b is not None else None
+                for a, b in zip(route, route[1:] + [route[0]])
+            )
+        except IndexError:
+            return np.inf
 
 
 class InnerOuterVertexOptimizer(Optimizer, ABC):
@@ -40,11 +47,14 @@ class InnerOuterVertexOptimizer(Optimizer, ABC):
             next_point = route[index_point + 1 if index_point + 1 < len(route) else 0]
 
             distance, neighbor = self.__find_nearest(next_point, point, prev_point, unused_vertices)
-            new_route = route[:]
-            new_route[point] = neighbor
+            if neighbor:
+                new_route = route[:]
+                new_route[index_point] = neighbor
 
-            solutions.append(Solution(distance, new_route))
+                solutions.append(Solution(distance, new_route))
 
+        if len(solutions) == 0:
+            solutions.append(Solution(np.inf, Route([])))
         return solutions
 
     def __get_unused_points(self, route: Route) -> List[int]:
@@ -59,7 +69,7 @@ class InnerOuterVertexOptimizer(Optimizer, ABC):
 
         nearest = {'distance': optimal_dist, 'neighbor': None}
 
-        for unused in enumerate(unused_vertices):
+        for unused in unused_vertices:
             prev_to_unused = self.distance_matrix[prev_point][unused]
             unused_to_next = self.distance_matrix[unused][next_point]
             dist = prev_to_unused + unused_to_next

@@ -1,4 +1,5 @@
 from csv import reader
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator, List, NewType
 import numpy as np
@@ -6,7 +7,13 @@ import numpy as np
 Matrix2D = NewType('Matrix2D', np.ndarray)
 
 
-def iterate_instances(instances_path: str) -> Generator[str, Matrix2D]:
+@dataclass
+class Instance:
+    name: str
+    distance_matrix: Matrix2D
+
+
+def iterate_instances(instances_path: str) -> Generator[Instance, None, None]:
     instances_path = Path(instances_path)
 
     for instance in instances_path.iterdir():
@@ -16,7 +23,7 @@ def iterate_instances(instances_path: str) -> Generator[str, Matrix2D]:
             points = [[int(strnum) for strnum in line] for line in r if line[0].isnumeric()]
             distance_matrix = __create_distance_matrix(points)
 
-            yield instance_name, distance_matrix
+            yield Instance(instance_name, distance_matrix)
 
 
 def __create_distance_matrix(points: List[List[int]]) -> Matrix2D:

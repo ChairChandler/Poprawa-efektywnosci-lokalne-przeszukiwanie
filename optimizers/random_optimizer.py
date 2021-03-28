@@ -1,8 +1,6 @@
-from base import TimerOptimizer, Route
+from .base import TimerOptimizer, Route, Solution
 import numpy as np
 import random
-
-from optimizers.base import Solution
 
 
 class RandomOptimizer(TimerOptimizer):

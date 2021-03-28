@@ -1,4 +1,4 @@
-from inner_vertex_optimizer import GlobalInnerVertexOptimizer, LocalInnerVertexOptimizer
+from .inner_vertex_optimizer import GlobalInnerVertexOptimizer, LocalInnerVertexOptimizer
 
 # unused_vertices = self.get_unused_points()
 # route = self.randomize_rotation(self.route)

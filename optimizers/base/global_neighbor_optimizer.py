@@ -1,13 +1,13 @@
 from abc import abstractmethod, ABC
 
-from optimizers.base.base import Route, Solution, InnerOuterVertexOptimizer
+from .base import Route, Solution, InnerOuterVertexOptimizer
 
 
 class GlobalNeighborOptimizer(InnerOuterVertexOptimizer, ABC):
     def _search(self) -> Solution:
         best_solution = Solution(self.init_cost, self.route)
 
-        while True:
+        while 1:
             solutions = [
                 self._find_best_solution(best_solution.route),
                 min(self._find_swap_inner_outer_vertices_solutions(best_solution.route), key=lambda x: x.cost)

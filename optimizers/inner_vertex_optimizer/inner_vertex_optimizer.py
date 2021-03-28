@@ -1,10 +1,11 @@
 from abc import ABC
 from typing import Generator, List
-from optimizers.base import Route, Solution, Optimizer, GlobalNeighborOptimizer, LocalNeighborOptimizer
+import numpy as np
+from ..base import Route, Solution, Optimizer, GlobalNeighborOptimizer, LocalNeighborOptimizer
 
 
 class InnerVertexOptimizer(Optimizer, ABC):
-    def _generate_solutions(self, route: Route) -> Generator[Solution]:
+    def _generate_solutions(self, route: Route) -> Generator[Solution, None, None]:
         route_len = len(route)
         half_route_len = int((route_len * (route_len - 1)) / 2)
 
@@ -39,15 +40,21 @@ class InnerVertexOptimizer(Optimizer, ABC):
 
                 if A_E_C_D_B_F < A_B_C_D_E_F and A_E_C_D_B_F:
                     new_route = route[:]
-                    new_route[point], new_route[another_point] = new_route[another_point], new_route[point]
+                    new_route[index], new_route[ap_index] = new_route[ap_index], new_route[index]
                     yield Solution(A_E_C_D_B_F, new_route)
 
 
 class GlobalInnerVertexOptimizer(GlobalNeighborOptimizer, InnerVertexOptimizer):
     def _find_best_solution(self, route: Route) -> Solution:
-        return min([*self._generate_solutions(route)], key=lambda x: x.cost)
+        try:
+            return min([*self._generate_solutions(route)], key=lambda x: x.cost)
+        except ValueError:
+            return Solution(np.inf, Route([]))
 
 
 class LocalInnerVertexOptimizer(LocalNeighborOptimizer, InnerVertexOptimizer):
     def _find_solutions(self, route: Route) -> List[Solution]:
-        return [*self._generate_solutions(route)]
+        solutions = [*self._generate_solutions(route)]
+        if len(solutions) == 0:
+            solutions.append(Solution(np.inf, Route([])))
+        return solutions

@@ -7,12 +7,15 @@ from optimizers import Route, RandomOptimizer, LocalInnerEdgeOptimizer, GlobalIn
 
 
 def main(instances_path: str, repeat: int):
-    for fname, distance_matrix in iterate_instances(instances_path):
+    for x in iterate_instances(instances_path):
+        print()
+        fname, distance_matrix = x.name, x.distance_matrix
         for i in range(repeat):
             vertices = distance_matrix.shape[0]
-            route = Route([*range(vertices)])
+            route = Route([*range(0, 50)])
             random.shuffle(route)
-            RandomOptimizer(distance_matrix, route, 100)
+            print('INIT ROUTE', route)
+            print(RandomOptimizer.__name__, RandomOptimizer(distance_matrix, route, 0.100)())
 
             optimizers = [
                 GlobalInnerEdgeOptimizer, GlobalInnerVertexOptimizer,
@@ -21,7 +24,9 @@ def main(instances_path: str, repeat: int):
 
             for Optimizer in optimizers:
                 opt = Optimizer(distance_matrix, route)
-                delta, route = opt()
+                print(Optimizer.__name__)
+                solution = opt()
+                print(solution)
 
 
 if __name__ == '__main__':

@@ -1,1 +1,1 @@
-from inner_edge_optimizer import GlobalInnerEdgeOptimizer, LocalInnerEdgeOptimizer
+from .inner_edge_optimizer import GlobalInnerEdgeOptimizer, LocalInnerEdgeOptimizer

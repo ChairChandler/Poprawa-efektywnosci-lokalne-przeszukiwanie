@@ -1,27 +1,30 @@
 from abc import abstractmethod, ABC
 from typing import List
-from itertools import chain
+import random
 
-from optimizers.base.base import Route, Solution, InnerOuterVertexOptimizer
+from .base import Route, Solution, InnerOuterVertexOptimizer
 
 
 class LocalNeighborOptimizer(InnerOuterVertexOptimizer, ABC):
     def _search(self) -> Solution:
         best_solution = Solution(self.init_cost, self.route)
-        no_new_solution = True
+        new_solution = True
 
-        while no_new_solution:
+        while new_solution:
+            new_solution = False
+
             solutions = [
-                self._find_solutions(best_solution.route),
-                self._find_swap_inner_outer_vertices_solutions(best_solution.route)
+                *self._find_solutions(best_solution.route),
+                *self._find_swap_inner_outer_vertices_solutions(best_solution.route)
             ]
 
-            for solution in chain.from_iterable(solutions):
+            random.shuffle(solutions)
+            for solution in solutions:
                 cost = self._calculate_score(solution.route)
 
                 if cost < best_solution.cost:
                     best_solution = Solution(cost, solution.route)
-                    no_new_solution = False
+                    new_solution = True
 
         return best_solution
 

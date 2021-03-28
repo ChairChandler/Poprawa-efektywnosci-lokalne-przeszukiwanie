@@ -3,11 +3,11 @@ from time import time
 from typing import Generator
 
 from loader import Matrix2D
-from optimizers.base.base import Optimizer, Route, Solution
+from .base import Optimizer, Route, Solution
 
 
 class TimerOptimizer(Optimizer):
-    def __init__(self, distance_matrix: Matrix2D, route: Route, max_processing_time_s: int):
+    def __init__(self, distance_matrix: Matrix2D, route: Route, max_processing_time_s: float):
         super().__init__(distance_matrix, route)
         self.max_processing_time_s = max_processing_time_s
 
@@ -20,5 +20,5 @@ class TimerOptimizer(Optimizer):
         return data
 
     @abstractmethod
-    def _find_solution(self) -> Generator[Solution]:
+    def _find_solution(self) -> Generator[Solution, None, None]:
         pass
