@@ -19,9 +19,8 @@ class Optimizer(ABC):
         self.route = route
         self.init_cost = self._calculate_score(self.route)
 
-    def __call__(self) -> [int, Route]:
-        solution = self._search()
-        return solution.cost, solution.route
+    def __call__(self) -> Solution:
+        return self._search()
 
     @abstractmethod
     def _search(self) -> Solution:

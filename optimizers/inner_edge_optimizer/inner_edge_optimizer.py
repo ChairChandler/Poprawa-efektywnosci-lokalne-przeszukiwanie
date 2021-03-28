@@ -34,6 +34,8 @@ class GlobalInnerEdgeOptimizer(GlobalNeighborOptimizer, InnerEdgeOptimizer):
 
 class LocalInnerEdgeOptimizer(LocalNeighborOptimizer, InnerEdgeOptimizer):
     def _find_solutions(self, route: Route) -> List[Solution]:
+        route = self._randomize_starting_point(route)
+        route = self._randomize_direction(route)
         solutions = [*self._generate_solutions(route)]
         if len(solutions) == 0:
             solutions.append(Solution(np.inf, Route([])))

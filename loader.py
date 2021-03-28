@@ -10,6 +10,7 @@ Matrix2D = NewType('Matrix2D', np.ndarray)
 @dataclass
 class Instance:
     name: str
+    points: List[List[int]]
     distance_matrix: Matrix2D
 
 
@@ -23,7 +24,7 @@ def iterate_instances(instances_path: str) -> Generator[Instance, None, None]:
             points = [[int(strnum) for strnum in line] for line in r if line[0].isnumeric()]
             distance_matrix = __create_distance_matrix(points)
 
-            yield Instance(instance_name, distance_matrix)
+            yield Instance(instance_name, points, distance_matrix)
 
 
 def __create_distance_matrix(points: List[List[int]]) -> Matrix2D:
