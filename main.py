@@ -46,9 +46,11 @@ def main(instances_path: str, repeat: int, output_path: str):
 
         routes = []
         print('[INSTANCE]', fname)
+        inform.write(f'[INSTANCE] {fname}\n')
+
         best_solutions_routes = [Solution(np.inf, Route([])) for _ in optimizers]
         for i in range(repeat):
-            print(f'[PROGRESS {i+1}/{repeat}]')
+            inform.write(f'[PROGRESS {i+1}/{repeat}]\n')
             vertices = distance_matrix.shape[0]
             route = Route([*range(vertices//2)])
             random.shuffle(route)
@@ -98,17 +100,18 @@ def main(instances_path: str, repeat: int, output_path: str):
         print('[COST_RANDOM]')
         print(df_random_opt)
 
-        print('[VISUALISING]')
+        inform.write('[VISUALISING]\n')
         for method, bs in zip([o.__name__ for o in optimizers], best_solutions_routes):
             visualize_route(bs.route, points, output_path, f'{fname}_{method}')
 
         visualize_route(random_solution.route, points, output_path, f'{fname}_{RandomOptimizer.__name__}')
 
-    print('[FINISHED]')
+    inform.write('[FINISHED]\n')
 
 
 if __name__ == '__main__':
     stdout = argv[4]
+    inform = sys.stdout
     with open(stdout, 'w') as stdout:
         sys.stdout = stdout
         main(argv[1], int(argv[2]), argv[3])
