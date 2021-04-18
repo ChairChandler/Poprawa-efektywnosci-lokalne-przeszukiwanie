@@ -2,7 +2,6 @@ from abc import abstractmethod, ABC
 from collections import deque
 import random
 from typing import List
-from itertools import chain
 
 from .base import Route, Solution, InnerOuterVertexOptimizer
 
@@ -14,11 +13,13 @@ class LocalNeighborOptimizer(InnerOuterVertexOptimizer, ABC):
 
         while new_solution:
             solutions = [
-                self._find_solutions(best_solution.route),
-                self._find_swap_inner_outer_vertices_solutions(best_solution.route)
+                *self._find_solutions(best_solution.route),
+                *self._find_swap_inner_outer_vertices_solutions(best_solution.route)
             ]
 
-            for solution in chain.from_iterable(solutions):
+            random.shuffle(solutions)
+
+            for solution in solutions:
                 cost = self._calculate_score(solution.route)
 
                 if cost < best_solution.cost:

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Generator, List
+from typing import Generator, List, Tuple
 import numpy as np
 from ..base import Route, Optimizer, Solution, GlobalNeighborOptimizer, LocalNeighborOptimizer
 
@@ -7,8 +7,8 @@ from ..base import Route, Optimizer, Solution, GlobalNeighborOptimizer, LocalNei
 class InnerEdgeOptimizer(Optimizer, ABC):
     def _generate_solutions(self, route: Route) -> Generator[Solution, None, None]:
         for index, point in enumerate(route[:-3]):
-            for ap_index, another_point in enumerate(route[index + 3:], index + 3):
-                rev = [*reversed(route[index+1:ap_index])]
+            for ap_index, another_point in self.__find_k_nearest(index, point, route):
+                rev = [*reversed(route[index + 1:ap_index])]
 
                 # A -> B -> ... -> C -> D
                 A_B = self.distance_matrix[point][rev[-1]]
@@ -20,8 +20,14 @@ class InnerEdgeOptimizer(Optimizer, ABC):
                 A_C_B_D = A_C + B_D
 
                 if A_C_B_D < A_B_C_D:
-                    new_route = route[:index+1] + rev + route[ap_index:]
+                    new_route = route[:index + 1] + rev + route[ap_index:]
                     yield Solution(A_C_B_D, new_route)
+
+    def __find_k_nearest(self, index: int, point: int, route: Route) -> List[Tuple[int, int]]:
+        neighbors = [(self.distance_matrix[point][another_point], ap_index, another_point)
+                     for ap_index, another_point in enumerate(route[index + 3:], index + 3)]
+
+        return [(ap_index, another_point) for _, ap_index, another_point in sorted(neighbors)][:5]
 
 
 class GlobalInnerEdgeOptimizer(GlobalNeighborOptimizer, InnerEdgeOptimizer):

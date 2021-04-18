@@ -35,8 +35,7 @@ def main(instances_path: str, repeat: int, output_path: str):
     print('[STARTED]')
 
     optimizers = [
-        GlobalInnerEdgeOptimizer, GlobalInnerVertexOptimizer,
-        LocalInnerEdgeOptimizer, LocalInnerVertexOptimizer
+        LocalInnerEdgeOptimizer
     ]
 
     for x in iterate_instances(instances_path):
@@ -82,7 +81,7 @@ def main(instances_path: str, repeat: int, output_path: str):
         print('[COST]')
         print(df_cost)
 
-        longest_mean_time = df_time.loc['mean'].min()
+        longest_mean_time = df_time.loc['mean'].max()
         df_random_opt = pd.DataFrame(columns=('time', 'cost'))
 
         random_solution = Solution(np.inf, Route([]))
@@ -91,7 +90,11 @@ def main(instances_path: str, repeat: int, output_path: str):
             solution = RandomOptimizer(distance_matrix, r, longest_mean_time)()
             end = time()
 
-            df_random_opt = df_random_opt.append({'time': end - begin, 'cost': solution.cost}, ignore_index=True)
+            df_random_opt = df_random_opt.append({
+                'time': end - begin,
+                'cost': solution.cost
+            }, ignore_index=True)
+
             if solution.cost < random_solution.cost:
                 random_solution = solution
 
